@@ -15,6 +15,7 @@ import java.util.*
 
 private const val TAG="MainActivity"
 private const val INITIAL_TIP_PERCENT=15
+private const val INITIAL_NUMBER_SPIT=1
 class MainActivity : AppCompatActivity() {
     private lateinit var etBaseAmount:EditText
     private lateinit var seekBarTip:SeekBar
@@ -22,6 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvTipAmount:TextView
     private lateinit var tvTotalAmount:TextView
     private lateinit var tvTipDescription:TextView
+    private lateinit var seekbarPPL:SeekBar
+    private lateinit var tvPerPersonAmount:TextView
+    private lateinit var numberPPL:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,10 +36,14 @@ class MainActivity : AppCompatActivity() {
         tvTipAmount=findViewById(R.id.tvTipAmount)
         tvTotalAmount=findViewById(R.id.tvTotalAmount)
         tvTipDescription=findViewById(R.id.tvTipDescription)
+        seekbarPPL=findViewById(R.id.seekbarNumberPPL)
+        tvPerPersonAmount=findViewById(R.id.tvPerPersonAmount)
+        numberPPL=findViewById(R.id.numberPPL)
 
         seekBarTip.progress= INITIAL_TIP_PERCENT
         tvTipPercentLabel.text="$INITIAL_TIP_PERCENT%"
         updateTipDescription(INITIAL_TIP_PERCENT)
+        numberPPL.text="$INITIAL_NUMBER_SPIT"
         seekBarTip.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 Log.i(TAG,"onProgressChanged $p1")
@@ -47,6 +55,20 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
 
             override fun onStopTrackingTouch(p0: SeekBar?) {}
+
+        })
+
+        seekbarPPL.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                numberPPL.text="$p1"
+                computeTipAndTotal()
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
 
         })
         etBaseAmount.addTextChangedListener(object : TextWatcher{
@@ -82,15 +104,19 @@ class MainActivity : AppCompatActivity() {
         if(etBaseAmount.text.isEmpty()){
             tvTipAmount.text="0"
             tvTotalAmount.text="0"
+            tvPerPersonAmount.text="0"
             return
         }
         val baseAmount = etBaseAmount.text.toString().toDouble()
         val tipPercent=seekBarTip.progress
+        val numberPPl= seekbarPPL.progress
 
         val tipAmount=baseAmount*tipPercent/100
         val totalAmount=baseAmount+tipAmount
+        val splitAmount=(baseAmount+tipAmount)/numberPPl
 
         tvTipAmount.text="%.2f".format(tipAmount)
         tvTotalAmount.text="%.2f".format(totalAmount)
+        tvPerPersonAmount.text="%.2f".format(splitAmount)
     }
 }
